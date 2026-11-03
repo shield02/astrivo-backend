@@ -160,5 +160,22 @@ Build incrementally using test-driven development. Each feature should have test
 
 ## Local development
 
-Commands will be finalized with the first implementation milestone. The intended workflow is to create a virtual environment, install the pinned project dependencies, start PostgreSQL and Redis locally, apply Alembic migrations, run the test suite, then start the API and ARQ worker separately. Azure integrations should be injectable and mockable so ordinary unit and API tests do not require cloud credentials.
+Docker Compose currently provides PostgreSQL and Redis for local development. The API and worker will run from the Python environment once their application scaffold is added. Azure integrations should be injectable and mockable so ordinary unit and API tests do not require cloud credentials.
+
+```bash
+# Optional: copy this file and adjust local ports or database settings.
+cp .env.example .env
+
+# Start local dependencies and wait for their health checks.
+docker compose up -d --wait
+
+# Check service state and logs.
+docker compose ps
+docker compose logs postgres redis
+
+# Stop services while preserving local database/cache volumes.
+docker compose down
+```
+
+PostgreSQL is available at `localhost:5432` (database/user `abstrivo`); Redis is available at `localhost:6379`. The default credentials and port bindings are intended only for local development. `docker compose down -v` removes the local data volumes and should be used only when you want to discard that data.
 
