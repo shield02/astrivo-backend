@@ -1,0 +1,40 @@
+# Git metadata and local development configuration
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+
+# Python environments, caches, and generated artifacts
+.venv
+venv
+env
+__pycache__
+*.py[cod]
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.tox
+.nox
+.coverage
+.coverage.*
+htmlcov
+coverage.xml
+build
+dist
+*.egg-info
+
+# Local-only data and logs
+uploads
+data
+artifacts
+*.sqlite
+*.sqlite3
+*.db
+*.log
+
+# Editor and operating-system metadata
+.idea
+.vscode
+.DS_Store
+Thumbs.db
