@@ -166,16 +166,15 @@ Docker Compose currently provides PostgreSQL and Redis for local development. Th
 # Optional: copy this file and adjust local ports or database settings.
 cp .env.example .env
 
-# Start local dependencies and wait for their health checks.
-docker compose up -d --wait
+# See all commands.
+make help
 
-# Check service state and logs.
-docker compose ps
-docker compose logs postgres redis
-
-# Stop services while preserving local database/cache volumes.
-docker compose down
+# Start dependencies, check status, follow logs, or stop (data is preserved).
+make up
+make ps
+make logs
+make down
 ```
 
-PostgreSQL is available at `localhost:5432` (database/user `abstrivo`); Redis is available at `localhost:6379`. The default credentials and port bindings are intended only for local development. `docker compose down -v` removes the local data volumes and should be used only when you want to discard that data.
+The Makefile also provides `make db-shell`, `make redis-shell`, `make logs-postgres`, and `make logs-redis`. When buildable services are added, `make build SERVICE=api` builds only the API image, while `make build` builds all images. `make rebuild SERVICE=api` rebuilds and starts only the API service; `make rebuild` rebuilds and starts all Compose services. PostgreSQL is available at `localhost:5432` (database/user `abstrivo`); Redis is available at `localhost:6379`. The default credentials and port bindings are intended only for local development. Removing Docker volumes deletes the local database/cache data.
 
