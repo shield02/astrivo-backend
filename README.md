@@ -162,6 +162,35 @@ Build incrementally using test-driven development. Each feature should have test
 
 Docker Compose currently provides PostgreSQL and Redis for local development. The API and worker will run from the Python environment once their application scaffold is added. Azure integrations should be injectable and mockable so ordinary unit and API tests do not require cloud credentials.
 
+### Current implementation status
+
+Milestone 1 has started with the FastAPI application foundation:
+
+- `app/main.py` provides the app factory and runnable `app` instance.
+- `GET /health` provides the initial liveness response.
+- `app/core/config.py` loads environment-backed settings with safe local defaults.
+- `pyproject.toml` defines runtime and development dependencies plus pytest configuration.
+- `tests/test_health.py` verifies the health response and OpenAPI registration.
+
+Step 2 adds the validated domain and transport contracts:
+
+- `app/domain/` contains business concepts such as document lifecycle states.
+- `app/schemas/` contains strict, versioned extraction validation models.
+- `app/api/v1/schemas/` contains HTTP response DTOs only; it does not contain query or business logic.
+- Repository/query code, services, and response normalization will remain separate as those features are implemented.
+
+Create a Python 3.11+ virtual environment, install the development dependencies, and run the tests:
+
+```bash
+python3.11 -m venv .venv
+.venv/bin/python -m pip install -r requirements-dev.txt
+.venv/bin/python -m pytest
+```
+
+The same dependencies are also declared in `pyproject.toml`. The `requirements.txt` file contains runtime dependencies, while `requirements-dev.txt` adds testing and development tools. VS Code is configured to use `.venv/bin/python`; use the Python 3.11+ interpreter when creating that environment.
+
+The document endpoints are intentionally not exposed until their request/response behavior is implemented and tested in the next milestones.
+
 ```bash
 # Optional: copy this file and adjust local ports or database settings.
 cp .env.example .env
