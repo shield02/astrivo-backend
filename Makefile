@@ -1,4 +1,4 @@
-.PHONY: help up rebuild build down restart ps logs logs-postgres logs-redis db-shell redis-shell
+.PHONY: help up rebuild build down restart ps logs logs-postgres logs-redis db-shell redis-shell db-upgrade db-downgrade worker
 
 help: ## Show available commands
 	@awk 'BEGIN {FS = ":.*## "}; /^[a-zA-Z_-]+:.*## / {printf "\033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -35,3 +35,12 @@ db-shell: ## Open a psql shell in the local database
 
 redis-shell: ## Open a Redis CLI shell
 	docker compose exec redis redis-cli
+
+db-upgrade: ## Apply all Alembic migrations
+	.venv/bin/alembic upgrade head
+
+db-downgrade: ## Roll back the latest Alembic migration
+	.venv/bin/alembic downgrade -1
+
+worker: ## Run the ARQ document-processing worker
+	.venv/bin/arq app.workers.document_worker.WorkerSettings
