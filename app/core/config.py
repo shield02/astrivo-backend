@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://abstrivo:abstrivo_local_dev@localhost:5432/abstrivo"
     database_echo: bool = False
     use_in_memory_repository: bool = False
+    redis_url: str = "redis://localhost:6380"
+    use_in_memory_queue: bool = True
+    document_storage_path: str = "data/documents"
     local_tenant_id: str = "00000000-0000-0000-0000-000000000001"
 
     model_config = SettingsConfigDict(
