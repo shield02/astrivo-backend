@@ -3,6 +3,7 @@ from uuid import UUID
 
 from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -46,3 +47,26 @@ class TaskModel(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     document: Mapped[DocumentModel] = relationship(back_populates="task")
+    extraction: Mapped["ExtractionModel | None"] = relationship(
+        back_populates="task", uselist=False
+    )
+
+
+class ExtractionModel(Base):
+    __tablename__ = "extractions"
+    __table_args__ = (Index("ix_extractions_tenant_document", "tenant_id", "document_id"),)
+
+    extraction_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True)
+    task_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        ForeignKey("tasks.task_id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    document_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
+    tenant_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
+    schema_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    payload: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    task: Mapped[TaskModel] = relationship(back_populates="extraction")
