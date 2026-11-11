@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -70,3 +70,22 @@ class ExtractionModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     task: Mapped[TaskModel] = relationship(back_populates="extraction")
+
+
+class DeadLetterModel(Base):
+    __tablename__ = "dead_letters"
+    __table_args__ = (Index("ix_dead_letters_tenant_created_at", "tenant_id", "created_at"),)
+
+    dead_letter_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), primary_key=True)
+    task_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        ForeignKey("tasks.task_id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    document_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
+    tenant_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False)
+    error_code: Mapped[str] = mapped_column(String(64), nullable=False)
+    error_message: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
